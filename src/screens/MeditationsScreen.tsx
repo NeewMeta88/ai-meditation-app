@@ -1,15 +1,15 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RootStackParamList } from "../navigation";
+import { generateAffirmation, Mood } from "../ai/affirmations";
 import { useSubscription } from "../state/subscriptionStore";
 import { MoodSelector } from "../components/MoodSelector";
 import { MeditationSession, SessionCard } from "../components/SessionCard";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Meditations">;
-type Mood = "Calm" | "Focused" | "Anxious";
 
 const sessions: MeditationSession[] = [
   {
@@ -38,17 +38,27 @@ const sessions: MeditationSession[] = [
   },
 ];
 
-const affirmationByMood: Record<Mood, string> = {
-  Calm: "Your breath is an anchor. In the midst of the day, you can return to center and steady peace.",
-  Focused: "Your attention is clear and steady. Every small step you take today compounds into meaningful progress.",
-  Anxious: "You are safe in this moment. Slow down, inhale deeply, and let each exhale release what you cannot carry.",
-};
-
 export function MeditationsScreen({ navigation }: Props) {
   const { isSubscribed } = useSubscription();
-  const [selectedMood, setSelectedMood] = useState<Mood>("Calm");
+  const [mood, setMood] = useState<Mood>("neutral");
+  const [loading, setLoading] = useState(false);
+  const [affirmation, setAffirmation] = useState(
+    "Your breath is an anchor. In the midst of the day, you have the power to find your center and return to a place of peace."
+  );
 
-  const affirmation = useMemo(() => affirmationByMood[selectedMood], [selectedMood]);
+  const handleGenerate = async () => {
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const nextAffirmation = await generateAffirmation({ mood });
+      setAffirmation(nextAffirmation);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-background-dark" edges={["top"]}>
@@ -109,7 +119,10 @@ export function MeditationsScreen({ navigation }: Props) {
                       navigation.navigate("Paywall");
                       return;
                     }
-                    navigation.navigate("Affirmation");
+                    navigation.navigate("Affirmation", {
+                      mood,
+                      initialText: affirmation,
+                    });
                   }}
                 />
               );
@@ -127,16 +140,21 @@ export function MeditationsScreen({ navigation }: Props) {
             </View>
             <Text className="mb-6 text-sm text-slate-400">How are you feeling right now?</Text>
 
-            <MoodSelector selectedMood={selectedMood} onSelectMood={setSelectedMood} />
+            <MoodSelector selectedMood={mood} onSelectMood={setMood} />
 
             <Pressable
               accessibilityRole="button"
-              onPress={() => navigation.navigate("Affirmation")}
-              style={({ pressed }) => [{ opacity: pressed ? 0.95 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] }]}
+              disabled={loading}
+              onPress={handleGenerate}
+              style={({ pressed }) => [
+                { opacity: loading ? 0.7 : pressed ? 0.95 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] },
+              ]}
               className="flex-row items-center justify-center gap-2 rounded-2xl bg-primary py-4"
             >
               <MaterialIcons name="psychology" size={20} color="#ffffff" />
-              <Text className="text-lg font-bold text-white">Generate Affirmation</Text>
+              <Text className="text-lg font-bold text-white">
+                {loading ? "Generating..." : "Generate Affirmation"}
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -149,11 +167,17 @@ export function MeditationsScreen({ navigation }: Props) {
             </Text>
           </View>
 
-          <View className="min-h-[104px] items-center justify-center">
+          <ScrollView
+            className="min-h-[104px]"
+            style={{ maxHeight: 220 }}
+            nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1, alignItems: "center", justifyContent: "center" }}
+          >
             <Text className="text-center text-[33px] italic leading-10 text-slate-300">
               &quot;{affirmation}&quot;
             </Text>
-          </View>
+          </ScrollView>
         </View>
       </ScrollView>
     </SafeAreaView>

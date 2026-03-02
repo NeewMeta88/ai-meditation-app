@@ -1,23 +1,23 @@
 import { Pressable, Text, View } from "react-native";
-
-type Mood = "Calm" | "Focused" | "Anxious";
+import { MOODS, Mood } from "../ai/affirmations";
 
 type MoodSelectorProps = {
   selectedMood: Mood;
   onSelectMood: (mood: Mood) => void;
 };
 
-const MOODS: Array<{ mood: Mood; emoji: string; accentClassName: string }> = [
-  { mood: "Calm", emoji: "\u{1F60C}", accentClassName: "border-accent-teal bg-accent-teal/10" },
-  { mood: "Focused", emoji: "\u{1F3AF}", accentClassName: "border-primary bg-primary/10" },
-  { mood: "Anxious", emoji: "\u{1F61F}", accentClassName: "border-orange-400 bg-orange-400/10" },
-];
+const ACCENT_BY_MOOD: Record<Mood, string> = {
+  happy: "border-accent-teal bg-accent-teal/10",
+  neutral: "border-primary bg-primary/10",
+  sad: "border-orange-400 bg-orange-400/10",
+};
 
 export function MoodSelector({ selectedMood, onSelectMood }: MoodSelectorProps) {
   return (
     <View className="mb-8 flex-row flex-wrap gap-3">
-      {MOODS.map(({ mood, emoji, accentClassName }) => {
+      {MOODS.map(({ mood, emoji, label }) => {
         const selected = selectedMood === mood;
+        const accentClassName = ACCENT_BY_MOOD[mood];
         return (
           <Pressable
             key={mood}
@@ -29,7 +29,7 @@ export function MoodSelector({ selectedMood, onSelectMood }: MoodSelectorProps) 
             }`}
           >
             <Text className="text-lg">{emoji}</Text>
-            <Text className="text-sm font-medium text-slate-100">{mood}</Text>
+            <Text className="text-sm font-medium text-slate-100">{label}</Text>
           </Pressable>
         );
       })}
