@@ -1,7 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RootStackParamList } from "../navigation";
 import { useSubscription } from "../state/subscriptionStore";
@@ -20,6 +20,8 @@ const BENEFITS = [
   { icon: "block", label: "No ads" },
 ] as const;
 
+const contentWidth = "88%";
+
 export function PaywallScreen({ navigation }: Props) {
   const { setSubscribed } = useSubscription();
   const [selectedPlan, setSelectedPlan] = useState<Plan>("yearly");
@@ -31,51 +33,37 @@ export function PaywallScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.backgroundDarkPaywall }}>
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView
-        className="flex-1"
+        style={styles.scroll}
         contentContainerStyle={{ paddingBottom: spacing[10] }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="mx-auto w-full max-w-md">
-          <View className="flex-row items-center justify-between px-6 py-5">
+        <View style={styles.container}>
+          <View style={styles.headerRow}>
             <Pressable
               accessibilityRole="button"
               android_ripple={{ color: rgba.white10, borderless: true }}
-              className="h-11 w-11 items-center justify-center rounded-full"
-              style={({ pressed }) => [{ backgroundColor: pressed ? rgba.white10 : "transparent" }]}
+              style={({ pressed }) => [
+                styles.closeButton,
+                { backgroundColor: pressed ? rgba.white10 : "transparent" },
+              ]}
             >
               <MaterialIcons name="close" size={24} color={colors.slate400} />
             </Pressable>
 
-            <View className="flex-row items-center gap-2">
-              <View
-                className="h-8 w-8 items-center justify-center"
-                style={{
-                  borderRadius: radius.lg,
-                  backgroundColor: colors.primary,
-                  ...shadows.glowLavender,
-                }}
-              >
+            <View style={styles.brandRow}>
+              <View style={styles.brandIconWrap}>
                 <MaterialIcons name="self-improvement" size={18} color={colors.white} />
               </View>
-              <Text
-                style={{
-                  color: colors.white,
-                  fontSize: typography.sizes.base,
-                  fontWeight: typography.weights.bold,
-                  letterSpacing: -0.2,
-                }}
-              >
-                ZenPulse
-              </Text>
+              <Text style={styles.brandText}>ZenPulse</Text>
             </View>
 
-            <View className="w-6" />
+            <View style={styles.headerSpacer} />
           </View>
 
-          <View className="px-6 pb-8 pt-3">
-            <View className="mb-6 overflow-hidden rounded-xl">
+          <View style={styles.heroSection}>
+            <View style={styles.heroImageWrap}>
               <Image
                 source={{
                   uri: "https://lh3.googleusercontent.com/aida-public/AB6AXuAOb4BQO9rnK3kG53-Mgs0Bfr6vW4FyDHdJ8HLgTea8qnsGdGW897jK1m-vFDHlXKz4rBCQpC3iR2Jfja2bvXTKcpo5s8F0uW497w6swG_vD4Oafl9H0MKNzH_k4ye-eA2pZr3BuWYDkH-Gt7QqQYY7zUj7Oezpky1yd5ehsfd6ZBpIXWVRGPJSZo-qida--NdcutB9Scslv4z7tGX0GdukmL2B5vrg-nGoq4j6G0aHMbRy9YO_JMRH6FNP9Vpx5FnaQqysYUGkIN8",
@@ -96,52 +84,30 @@ export function PaywallScreen({ navigation }: Props) {
               />
             </View>
 
-            <Text
-              className="text-center"
-              style={{
-                color: colors.white,
-                fontSize: typography.sizes.x3l,
-                fontWeight: typography.weights.bold,
-                letterSpacing: -0.5,
-              }}
-            >
+            <Text style={styles.heroTitle}>
               Unlock ZenPulse Premium
             </Text>
-            <Text
-              className="mt-2 text-center"
-              style={{ color: colors.slate400, fontSize: typography.sizes.lg }}
-            >
+            <Text style={styles.heroSubtitle}>
               Experience your daily calm
             </Text>
           </View>
 
-          <View className="mb-10 px-8" style={{ gap: spacing[4] }}>
+          <View style={styles.benefitsSection}>
             {BENEFITS.map((benefit) => (
-              <View key={benefit.label} className="flex-row items-center" style={{ gap: spacing[4] }}>
-                <View
-                  className="h-8 w-8 items-center justify-center rounded-full"
-                  style={{ backgroundColor: rgba.accentTeal05 }}
-                >
+              <View key={benefit.label} style={styles.benefitRow}>
+                <View style={styles.benefitIconWrap}>
                   <MaterialIcons name={benefit.icon} size={20} color={colors.accentTeal} />
                 </View>
-                <Text
-                  style={{
-                    color: colors.white,
-                    fontSize: typography.sizes.base,
-                    fontWeight: typography.weights.medium,
-                  }}
-                >
-                  {benefit.label}
-                </Text>
+                <Text style={styles.benefitText}>{benefit.label}</Text>
               </View>
             ))}
           </View>
 
-          <View className="mb-8 px-6" style={{ gap: spacing[4] }}>
+          <View style={styles.plansSection}>
             <Pressable
               accessibilityRole="button"
               onPress={() => setSelectedPlan("yearly")}
-              style={({ pressed }) => [{ opacity: pressed ? 0.96 : 1 }]}
+              style={({ pressed }) => [styles.planButtonWrap, { opacity: pressed ? 0.96 : 1 }]}
             >
               <GlassCard variant={selectedPlan === "yearly" ? "active" : "default"} style={{ padding: spacing[5] }}>
                 <View
@@ -168,20 +134,11 @@ export function PaywallScreen({ navigation }: Props) {
                   </Text>
                 </View>
 
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center" style={{ gap: spacing[4] }}>
-                    <View
-                      className="h-6 w-6 items-center justify-center rounded-full"
-                      style={{
-                        borderWidth: 2,
-                        borderColor: selectedPlan === "yearly" ? colors.primary : colors.slate700,
-                      }}
-                    >
+                <View style={styles.planRow}>
+                  <View style={styles.planLeft}>
+                    <View style={[styles.radioOuter, { borderColor: selectedPlan === "yearly" ? colors.primary : colors.slate700 }]}>
                       {selectedPlan === "yearly" ? (
-                        <View
-                          className="h-3 w-3 rounded-full"
-                          style={{ backgroundColor: colors.primary }}
-                        />
+                        <View style={styles.radioInner} />
                       ) : null}
                     </View>
                     <View>
@@ -205,7 +162,7 @@ export function PaywallScreen({ navigation }: Props) {
                       </Text>
                     </View>
                   </View>
-                  <View className="items-end">
+                  <View style={styles.planPriceWrap}>
                     <Text
                       style={{
                         color: colors.white,
@@ -226,23 +183,14 @@ export function PaywallScreen({ navigation }: Props) {
             <Pressable
               accessibilityRole="button"
               onPress={() => setSelectedPlan("monthly")}
-              style={({ pressed }) => [{ opacity: pressed ? 0.96 : 1 }]}
+              style={({ pressed }) => [styles.planButtonWrap, { opacity: pressed ? 0.96 : 1 }]}
             >
               <GlassCard variant={selectedPlan === "monthly" ? "active" : "default"} style={{ padding: spacing[5] }}>
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center" style={{ gap: spacing[4] }}>
-                    <View
-                      className="h-6 w-6 items-center justify-center rounded-full"
-                      style={{
-                        borderWidth: 2,
-                        borderColor: selectedPlan === "monthly" ? colors.primary : colors.slate700,
-                      }}
-                    >
+                <View style={styles.planRow}>
+                  <View style={styles.planLeft}>
+                    <View style={[styles.radioOuter, { borderColor: selectedPlan === "monthly" ? colors.primary : colors.slate700 }]}>
                       {selectedPlan === "monthly" ? (
-                        <View
-                          className="h-3 w-3 rounded-full"
-                          style={{ backgroundColor: colors.primary }}
-                        />
+                        <View style={styles.radioInner} />
                       ) : null}
                     </View>
                     <Text
@@ -255,7 +203,7 @@ export function PaywallScreen({ navigation }: Props) {
                       Monthly
                     </Text>
                   </View>
-                  <View className="items-end">
+                  <View style={styles.planPriceWrap}>
                     <Text
                       style={{
                         color: colors.white,
@@ -274,42 +222,35 @@ export function PaywallScreen({ navigation }: Props) {
             </Pressable>
           </View>
 
-          <View className="mt-auto px-6 pb-6">
+          <View style={styles.ctaSection}>
             <PrimaryButton
               label="Try Free for 7 Days"
               onPress={handleSubscribe}
               style={{
                 minHeight: 64,
                 borderRadius: radius.xl,
+                width: "100%",
               }}
               textStyle={{ fontSize: typography.sizes.lg, fontWeight: typography.weights.bold }}
             />
           </View>
 
-          <View className="px-8 pb-10">
-            <Text
-              className="text-center"
-              style={{
-                color: colors.slate500,
-                fontSize: typography.sizes.xxs,
-                lineHeight: 16,
-                marginBottom: spacing[6],
-              }}
-            >
+          <View style={styles.legalSection}>
+            <Text style={styles.legalText}>
               Your subscription will automatically renew at the end of the trial period. You can
               cancel at any time in your store settings.
             </Text>
 
-            <View className="flex-row flex-wrap items-center justify-center" style={{ gap: spacing[3] }}>
-              <Text style={{ color: colors.slate400, fontSize: typography.sizes.xs, fontWeight: typography.weights.medium }}>
+            <View style={styles.linksRow}>
+              <Text style={styles.linkText}>
                 Restore Purchase
               </Text>
-              <View className="h-1 w-1 rounded-full" style={{ backgroundColor: colors.slate700 }} />
-              <Text style={{ color: colors.slate400, fontSize: typography.sizes.xs, fontWeight: typography.weights.medium }}>
+              <View style={styles.linkDot} />
+              <Text style={styles.linkText}>
                 Terms of Service
               </Text>
-              <View className="h-1 w-1 rounded-full" style={{ backgroundColor: colors.slate700 }} />
-              <Text style={{ color: colors.slate400, fontSize: typography.sizes.xs, fontWeight: typography.weights.medium }}>
+              <View style={styles.linkDot} />
+              <Text style={styles.linkText}>
                 Privacy Policy
               </Text>
             </View>
@@ -319,3 +260,175 @@ export function PaywallScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.backgroundDarkPaywall,
+  },
+  scroll: {
+    flex: 1,
+  },
+  container: {
+    width: "100%",
+    maxWidth: 380,
+    alignSelf: "center",
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing[6],
+    paddingVertical: spacing[5],
+  },
+  closeButton: {
+    height: 44,
+    width: 44,
+    borderRadius: radius.full,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[2],
+  },
+  brandIconWrap: {
+    height: 32,
+    width: 32,
+    borderRadius: radius.lg,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadows.glowLavender,
+  },
+  brandText: {
+    color: colors.white,
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+    letterSpacing: -0.3,
+  },
+  headerSpacer: {
+    width: 24,
+  },
+  heroSection: {
+    width: contentWidth,
+    alignSelf: "center",
+    paddingTop: spacing[2],
+    marginBottom: spacing[8],
+  },
+  heroImageWrap: {
+    marginBottom: spacing[6],
+    overflow: "hidden",
+    borderRadius: radius.xl,
+  },
+  heroTitle: {
+    textAlign: "center",
+    color: colors.white,
+    fontSize: typography.sizes.x3l,
+    fontWeight: typography.weights.bold,
+    letterSpacing: -0.5,
+  },
+  heroSubtitle: {
+    marginTop: spacing[2],
+    textAlign: "center",
+    color: colors.slate400,
+    fontSize: typography.sizes.lg,
+  },
+  benefitsSection: {
+    width: contentWidth,
+    alignSelf: "center",
+    gap: spacing[4],
+    marginBottom: spacing[8],
+  },
+  benefitRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[4],
+  },
+  benefitIconWrap: {
+    height: 32,
+    width: 32,
+    borderRadius: radius.full,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: rgba.accentTeal05,
+  },
+  benefitText: {
+    color: colors.white,
+    fontSize: typography.sizes.base,
+    fontWeight: typography.weights.medium,
+  },
+  plansSection: {
+    width: contentWidth,
+    alignSelf: "center",
+    gap: spacing[4],
+    marginBottom: spacing[8],
+  },
+  planButtonWrap: {
+    width: "100%",
+    alignSelf: "center",
+  },
+  planRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  planLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[4],
+  },
+  radioOuter: {
+    height: 24,
+    width: 24,
+    borderRadius: radius.full,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  radioInner: {
+    height: 12,
+    width: 12,
+    borderRadius: radius.full,
+    backgroundColor: colors.primary,
+  },
+  planPriceWrap: {
+    alignItems: "flex-end",
+  },
+  ctaSection: {
+    width: contentWidth,
+    alignSelf: "center",
+    marginBottom: spacing[8],
+  },
+  legalSection: {
+    width: contentWidth,
+    alignSelf: "center",
+    paddingBottom: spacing[10],
+  },
+  legalText: {
+    textAlign: "center",
+    color: colors.slate500,
+    fontSize: typography.sizes.xxs,
+    lineHeight: 16,
+    marginBottom: spacing[6],
+  },
+  linksRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing[3],
+  },
+  linkText: {
+    color: colors.slate400,
+    fontSize: typography.sizes.xs,
+    fontWeight: typography.weights.medium,
+  },
+  linkDot: {
+    height: 4,
+    width: 4,
+    borderRadius: radius.full,
+    backgroundColor: colors.slate700,
+  },
+});
