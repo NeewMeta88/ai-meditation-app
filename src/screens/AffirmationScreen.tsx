@@ -18,10 +18,9 @@ export function AffirmationScreen({ navigation, route }: Props) {
   const [affirmation, setAffirmation] = useState(route.params?.initialText ?? DEFAULT_AFFIRMATION);
   const [loading, setLoading] = useState(false);
 
-  const moodLabel = useMemo(
-    () => MOODS.find((entry) => entry.mood === mood)?.label ?? "Calm",
-    [mood]
-  );
+  const moodMeta = useMemo(() => MOODS.find((entry) => entry.mood === mood), [mood]);
+  const moodLabel = moodMeta?.label ?? "Calm";
+  const moodEmoji = moodMeta?.emoji ?? "\u{1F60C}";
 
   const handleRegenerate = async () => {
     if (loading) {
@@ -74,12 +73,22 @@ export function AffirmationScreen({ navigation, route }: Props) {
         />
 
         <View style={{ width: "100%", maxWidth: 448, alignSelf: "center", paddingHorizontal: spacing[6] }}>
+          <View style={{ alignItems: "center", paddingTop: spacing[2] }}>
+            <Badge
+              tone="calm"
+              label={moodLabel}
+              icon={<Text style={{ fontSize: typography.sizes.sm }}>{moodEmoji}</Text>}
+              style={{ alignSelf: "center" }}
+            />
+          </View>
+
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              paddingVertical: spacing[6],
+              paddingTop: spacing[5],
+              paddingBottom: spacing[6],
             }}
           >
             <Pressable
@@ -121,14 +130,6 @@ export function AffirmationScreen({ navigation, route }: Props) {
             >
               <MaterialIcons name="share" size={22} color={colors.slate100} />
             </Pressable>
-          </View>
-
-          <View style={{ alignItems: "center", marginTop: spacing[4] }}>
-            <Badge
-              tone="calm"
-              label={moodLabel}
-              icon={<Text style={{ fontSize: typography.sizes.sm }}>??</Text>}
-            />
           </View>
 
           <View style={{ marginTop: spacing[8], flex: 1 }}>
