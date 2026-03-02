@@ -1,18 +1,20 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RootStackParamList } from "../navigation";
 import { generateAffirmation, Mood } from "../ai/affirmations";
 import { useSubscription } from "../state/subscriptionStore";
 import { MoodSelector } from "../components/MoodSelector";
 import { MeditationSession, SessionCard } from "../components/SessionCard";
+import { colors, radius, rgba, shadows, spacing, typography } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Meditations">;
 
-const SESSION_CARD_WIDTH = 280;
-const SESSION_CARD_SPACING = 16;
+const SESSION_CARD_WIDTH = 248;
+const SESSION_CARD_SPACING = 14;
+const CONTENT_WIDTH = "88%";
 
 const sessions: MeditationSession[] = [
   {
@@ -64,40 +66,36 @@ export function MeditationsScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background-dark">
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ paddingBottom: 28 }}
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View className="px-6 pb-6 pt-2">
-          <View className="flex-row items-center justify-between">
-            <View className="flex-row items-center gap-3">
-              <View className="h-12 w-12 items-center justify-center rounded-full border-2 border-primary/30 bg-primary/15">
+        <View style={styles.headerSection}>
+          <View style={styles.headerRow}>
+            <View style={styles.userRow}>
+              <View style={styles.avatar}>
                 <MaterialIcons name="person" size={26} color="#f8fafc" />
               </View>
               <View>
-                <Text className="text-[11px] font-semibold uppercase tracking-[1.1px] text-slate-400">
-                  Welcome back
-                </Text>
-                <Text className="text-[36px] font-bold leading-10 text-slate-100">Good Morning, Alex</Text>
+                <Text style={styles.welcomeText}>Welcome back</Text>
+                <Text style={styles.greetingText}>Good Morning, Alex</Text>
               </View>
             </View>
 
-            <View className="flex-row items-center gap-1.5 rounded-full border border-primary/30 bg-primary/20 px-3 py-1.5">
+            <View style={styles.premiumBadge}>
               <MaterialIcons name="workspace-premium" size={16} color="#9513ec" />
-              <Text className="text-[10px] font-bold uppercase tracking-[0.5px] text-primary">
-                Premium
-              </Text>
+              <Text style={styles.premiumBadgeText}>Premium</Text>
             </View>
           </View>
         </View>
 
-        <View className="pb-8">
-          <View className="mb-4 flex-row items-center justify-between px-6">
-            <Text className="text-[32px] font-bold text-slate-100">Today&apos;s sessions</Text>
+        <View style={styles.sessionsSection}>
+          <View style={styles.sessionsHeader}>
+            <Text style={styles.sessionsTitle}>Today&apos;s sessions</Text>
             <Pressable accessibilityRole="button" style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}>
-              <Text className="text-sm font-semibold text-primary">View All</Text>
+              <Text style={styles.viewAllText}>View All</Text>
             </Pressable>
           </View>
 
@@ -106,7 +104,7 @@ export function MeditationsScreen({ navigation }: Props) {
             data={sessions}
             keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 24 }}
+            contentContainerStyle={styles.sessionsListContent}
             ItemSeparatorComponent={() => <View style={{ width: SESSION_CARD_SPACING }} />}
             decelerationRate="fast"
             snapToAlignment="start"
@@ -143,15 +141,15 @@ export function MeditationsScreen({ navigation }: Props) {
           />
         </View>
 
-        <View className="mx-6 mb-6 overflow-hidden rounded-3xl border border-white/10 bg-white/5 px-5 py-6">
-          <View className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-primary/25" />
+        <View style={styles.moodCard}>
+          <View style={styles.moodGlow} />
 
-          <View className="relative z-10">
-            <View className="mb-2 flex-row items-center gap-2">
+          <View style={styles.moodCardContent}>
+            <View style={styles.moodTitleRow}>
               <MaterialIcons name="auto-awesome" size={20} color="#9513ec" />
-              <Text className="text-[38px] font-bold leading-10 text-slate-100">AI Mood of the Day</Text>
+              <Text style={styles.moodTitle}>AI Mood of the Day</Text>
             </View>
-            <Text className="mb-6 text-sm text-slate-400">How are you feeling right now?</Text>
+            <Text style={styles.moodSubtitle}>How are you feeling right now?</Text>
 
             <MoodSelector selectedMood={mood} onSelectMood={setMood} />
 
@@ -160,34 +158,34 @@ export function MeditationsScreen({ navigation }: Props) {
               disabled={loading}
               onPress={handleGenerate}
               style={({ pressed }) => [
-                { opacity: loading ? 0.7 : pressed ? 0.95 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] },
+                styles.generateButton,
+                {
+                  opacity: loading ? 0.7 : pressed ? 0.95 : 1,
+                  transform: [{ scale: pressed ? 0.99 : 1 }],
+                },
               ]}
-              className="flex-row items-center justify-center gap-2 rounded-2xl bg-primary py-4"
             >
               <MaterialIcons name="psychology" size={20} color="#ffffff" />
-              <Text className="text-lg font-bold text-white">
+              <Text style={styles.generateButtonText}>
                 {loading ? "Generating..." : "Generate Affirmation"}
               </Text>
             </Pressable>
           </View>
         </View>
 
-        <View className="mx-6 rounded-3xl border border-white/5 bg-surface-dark/55 px-6 py-6">
-          <View className="mb-4 flex-row items-center gap-3">
-            <View className="h-6 w-1 rounded-full bg-primary" />
-            <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-500">
-              Your Affirmation
-            </Text>
+        <View style={styles.outputCard}>
+          <View style={styles.outputHeader}>
+            <View style={styles.outputHeaderLine} />
+            <Text style={styles.outputHeaderText}>Your Affirmation</Text>
           </View>
 
           <ScrollView
-            className="min-h-[104px]"
-            style={{ maxHeight: 220 }}
+            style={styles.outputScroll}
             nestedScrollEnabled
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ flexGrow: 1, alignItems: "center", justifyContent: "center" }}
+            contentContainerStyle={styles.outputScrollContent}
           >
-            <Text className="text-center text-[33px] italic leading-10 text-slate-300">
+            <Text style={styles.outputText}>
               &quot;{affirmation}&quot;
             </Text>
           </ScrollView>
@@ -196,3 +194,202 @@ export function MeditationsScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.backgroundDarkHome,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: spacing[10],
+  },
+  headerSection: {
+    width: CONTENT_WIDTH,
+    alignSelf: "center",
+    paddingTop: spacing[2],
+    paddingBottom: spacing[6],
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: spacing[3],
+  },
+  userRow: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[3],
+  },
+  avatar: {
+    height: 48,
+    width: 48,
+    borderRadius: radius.full,
+    borderWidth: 2,
+    borderColor: rgba.primary30,
+    backgroundColor: rgba.primary15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  welcomeText: {
+    color: colors.slate400,
+    fontSize: 11,
+    fontWeight: typography.weights.semibold,
+    textTransform: "uppercase",
+    letterSpacing: 1.1,
+  },
+  greetingText: {
+    color: colors.slate100,
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.bold,
+    lineHeight: 22,
+  },
+  premiumBadge: {
+    flexShrink: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[1.5],
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: rgba.primary30,
+    backgroundColor: rgba.primary20,
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[1.5],
+    ...shadows.glowLavender,
+  },
+  premiumBadgeText: {
+    fontSize: typography.sizes.xxs,
+    fontWeight: typography.weights.bold,
+    color: colors.primary,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  sessionsSection: {
+    marginBottom: spacing[8],
+  },
+  sessionsHeader: {
+    width: CONTENT_WIDTH,
+    alignSelf: "center",
+    marginBottom: spacing[4],
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  sessionsTitle: {
+    color: colors.slate100,
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+  },
+  viewAllText: {
+    color: colors.primary,
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.semibold,
+  },
+  sessionsListContent: {
+    paddingHorizontal: spacing[6],
+  },
+  moodCard: {
+    width: CONTENT_WIDTH,
+    alignSelf: "center",
+    marginBottom: spacing[6],
+    overflow: "hidden",
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: rgba.white10,
+    backgroundColor: rgba.white05,
+    paddingHorizontal: spacing[5],
+    paddingVertical: spacing[6],
+  },
+  moodGlow: {
+    position: "absolute",
+    right: -44,
+    top: -48,
+    height: 140,
+    width: 140,
+    borderRadius: radius.full,
+    backgroundColor: rgba.primary20,
+  },
+  moodCardContent: {
+    zIndex: 1,
+  },
+  moodTitleRow: {
+    marginBottom: spacing[2],
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[2],
+  },
+  moodTitle: {
+    color: colors.slate100,
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold,
+  },
+  moodSubtitle: {
+    marginBottom: spacing[6],
+    color: colors.slate400,
+    fontSize: typography.sizes.sm,
+  },
+  generateButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing[2],
+    borderRadius: radius.lg,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing[4],
+    ...shadows.glowPrimary,
+  },
+  generateButtonText: {
+    color: colors.white,
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.bold,
+  },
+  outputCard: {
+    width: CONTENT_WIDTH,
+    alignSelf: "center",
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    borderColor: rgba.white05,
+    backgroundColor: "rgba(30, 41, 59, 0.55)",
+    paddingHorizontal: spacing[6],
+    paddingVertical: spacing[6],
+  },
+  outputHeader: {
+    marginBottom: spacing[4],
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing[3],
+  },
+  outputHeaderLine: {
+    height: 24,
+    width: 4,
+    borderRadius: radius.full,
+    backgroundColor: colors.primary,
+  },
+  outputHeaderText: {
+    color: colors.slate500,
+    fontSize: 11,
+    fontWeight: typography.weights.bold,
+    textTransform: "uppercase",
+    letterSpacing: 2,
+  },
+  outputScroll: {
+    minHeight: 104,
+    maxHeight: 220,
+  },
+  outputScrollContent: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  outputText: {
+    textAlign: "center",
+    color: colors.slate300,
+    fontSize: typography.sizes.lg,
+    fontStyle: "italic",
+    lineHeight: 30,
+  },
+});
