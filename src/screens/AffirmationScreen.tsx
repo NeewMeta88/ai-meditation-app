@@ -1,21 +1,27 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { generateAffirmation, Mood } from "../ai/affirmations";
+import { generateAffirmation, Mood, MOODS } from "../ai/affirmations";
 import { RootStackParamList } from "../navigation";
+import { colors, radius, rgba, spacing, typography } from "../theme/tokens";
+import { Badge, PrimaryButton, SecondaryButton } from "../ui";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Affirmation">;
 
 const DEFAULT_AFFIRMATION =
-  "I create calm and focus with every breath.";
+  "I am at peace with my past and excited for my future. Each breath I take fills me with tranquility and strength.";
 
 export function AffirmationScreen({ navigation, route }: Props) {
   const [mood] = useState<Mood>(route.params?.mood ?? "neutral");
-  const [affirmation, setAffirmation] = useState(
-    route.params?.initialText ?? DEFAULT_AFFIRMATION
-  );
+  const [affirmation, setAffirmation] = useState(route.params?.initialText ?? DEFAULT_AFFIRMATION);
   const [loading, setLoading] = useState(false);
+
+  const moodLabel = useMemo(
+    () => MOODS.find((entry) => entry.mood === mood)?.label ?? "Calm",
+    [mood]
+  );
 
   const handleRegenerate = async () => {
     if (loading) {
@@ -36,50 +42,196 @@ export function AffirmationScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-rose-950">
-      <View className="flex-1 justify-center px-6">
-        <Text className="text-center text-3xl font-bold text-rose-100">
-          Daily Affirmation
-        </Text>
-        <ScrollView
-          className="mt-4"
-          style={{ maxHeight: 220 }}
-          nestedScrollEnabled
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
-        >
-          <Text className="text-center text-lg text-rose-200">{affirmation}</Text>
-        </ScrollView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.backgroundDarkAffirmation }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: spacing[8] }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            top: "20%",
+            right: "-35%",
+            width: 500,
+            height: 500,
+            borderRadius: radius.full,
+            backgroundColor: "rgba(149, 19, 236, 0.05)",
+          }}
+        />
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            bottom: "18%",
+            left: "-35%",
+            width: 500,
+            height: 500,
+            borderRadius: radius.full,
+            backgroundColor: rgba.indigo90010,
+          }}
+        />
 
-        <Pressable
-          disabled={loading}
-          onPress={handleRegenerate}
-          style={({ pressed }) => [{ opacity: loading ? 0.7 : pressed ? 0.9 : 1 }]}
-          className="mt-10 rounded-2xl bg-rose-300 px-5 py-4"
-        >
-          <Text className="text-center text-base font-semibold text-rose-950">
-            {loading ? "Regenerating..." : "Regenerate"}
-          </Text>
-        </Pressable>
+        <View style={{ width: "100%", maxWidth: 448, alignSelf: "center", paddingHorizontal: spacing[6] }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingVertical: spacing[6],
+            }}
+          >
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => navigation.goBack()}
+              style={({ pressed }) => ({
+                width: 40,
+                height: 40,
+                borderRadius: radius.full,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: pressed ? rgba.white20 : rgba.white10,
+              })}
+            >
+              <MaterialIcons name="arrow-back" size={22} color={colors.slate100} />
+            </Pressable>
 
-        <Pressable
-          onPress={handleSave}
-          className="mt-4 rounded-2xl bg-rose-300 px-5 py-4"
-        >
-          <Text className="text-center text-base font-semibold text-rose-950">
-            Save
-          </Text>
-        </Pressable>
+            <Text
+              style={{
+                color: colors.slate100,
+                fontSize: typography.sizes.lg,
+                fontWeight: typography.weights.semibold,
+                letterSpacing: -0.2,
+              }}
+            >
+              Your AI Affirmation
+            </Text>
 
-        <Pressable
-          onPress={() => navigation.goBack()}
-          className="mt-4 rounded-2xl bg-rose-300 px-5 py-4"
-        >
-          <Text className="text-center text-base font-semibold text-rose-950">
-            Back to Meditations
-          </Text>
-        </Pressable>
-      </View>
+            <Pressable
+              accessibilityRole="button"
+              style={({ pressed }) => ({
+                width: 40,
+                height: 40,
+                borderRadius: radius.full,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: pressed ? rgba.white20 : rgba.white10,
+              })}
+            >
+              <MaterialIcons name="share" size={22} color={colors.slate100} />
+            </Pressable>
+          </View>
+
+          <View style={{ alignItems: "center", marginTop: spacing[4] }}>
+            <Badge
+              tone="calm"
+              label={moodLabel}
+              icon={<Text style={{ fontSize: typography.sizes.sm }}>??</Text>}
+            />
+          </View>
+
+          <View style={{ marginTop: spacing[8], flex: 1 }}>
+            <View
+              style={{
+                minHeight: 400,
+                borderRadius: radius.xl,
+                padding: spacing[8],
+                borderWidth: 1,
+                borderColor: rgba.primary20,
+                backgroundColor: rgba.backgroundAffirmation40,
+                overflow: "hidden",
+              }}
+            >
+              <View
+                pointerEvents="none"
+                style={{
+                  position: "absolute",
+                  top: -96,
+                  right: -96,
+                  width: 256,
+                  height: 256,
+                  borderRadius: radius.full,
+                  backgroundColor: rgba.primary20,
+                }}
+              />
+              <View
+                pointerEvents="none"
+                style={{
+                  position: "absolute",
+                  bottom: -96,
+                  left: -96,
+                  width: 256,
+                  height: 256,
+                  borderRadius: radius.full,
+                  backgroundColor: rgba.indigo50010,
+                }}
+              />
+
+              <View style={{ flex: 1, justifyContent: "center" }}>
+                <MaterialIcons
+                  name="format-quote"
+                  size={42}
+                  color="rgba(149, 19, 236, 0.4)"
+                  style={{ marginBottom: spacing[6], alignSelf: "center" }}
+                />
+
+                <Text
+                  style={{
+                    color: colors.slate100,
+                    fontSize: typography.sizes.x3l,
+                    fontWeight: typography.weights.light,
+                    lineHeight: 42,
+                    letterSpacing: -0.5,
+                    textAlign: "center",
+                  }}
+                >
+                  {affirmation}
+                </Text>
+
+                <View style={{ marginTop: spacing[10], alignItems: "center" }}>
+                  <View
+                    style={{
+                      height: 4,
+                      width: 48,
+                      borderRadius: radius.full,
+                      backgroundColor: rgba.primary30,
+                    }}
+                  />
+                  <Text
+                    style={{
+                      marginTop: spacing[2],
+                      color: colors.slate400,
+                      fontSize: typography.sizes.sm,
+                      fontWeight: typography.weights.medium,
+                      letterSpacing: 3,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Generated for you
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          <View style={{ marginTop: spacing[10], gap: spacing[4] }}>
+            <PrimaryButton
+              label={loading ? "Regenerating..." : "Regenerate"}
+              onPress={handleRegenerate}
+              disabled={loading}
+              leftIcon={<MaterialIcons name="auto-awesome" size={20} color={colors.white} />}
+              style={{ minHeight: 64 }}
+            />
+            <SecondaryButton
+              label="Save to Favorites"
+              onPress={handleSave}
+              leftIcon={<MaterialIcons name="favorite-border" size={20} color={colors.slate100} />}
+              style={{ minHeight: 64 }}
+            />
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
