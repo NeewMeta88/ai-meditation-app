@@ -25,15 +25,14 @@ export function RootNavigator() {
   }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!isSubscribed ? (
-        <Stack.Screen name="Paywall" component={PaywallScreen} />
-      ) : (
-        <>
-          <Stack.Screen name="Meditations" component={MeditationsScreen} />
-          <Stack.Screen name="Affirmation" component={AffirmationScreen} />
-        </>
-      )}
+    <Stack.Navigator
+      key={isSubscribed ? "subscribed" : "free"}
+      initialRouteName={isSubscribed ? "Meditations" : "Paywall"}
+      screenOptions={{ headerShown: false }}
+    >
+      <Stack.Screen name="Paywall" component={PaywallScreen} />
+      <Stack.Screen name="Meditations" component={MeditationsScreen} />
+      <Stack.Screen name="Affirmation" component={AffirmationScreen} />
     </Stack.Navigator>
   );
 }
