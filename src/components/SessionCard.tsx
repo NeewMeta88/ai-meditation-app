@@ -21,7 +21,8 @@ export function SessionCard({ session, locked, onPress }: SessionCardProps) {
       accessibilityRole="button"
       onPress={onPress}
       android_ripple={{ color: "rgba(255,255,255,0.12)", borderless: false }}
-      style={({ pressed }) => [{ width: 280, opacity: pressed ? 0.96 : 1 }]}
+      hitSlop={6}
+      style={({ pressed }) => [{ width: 280, opacity: pressed ? 0.96 : 1, transform: [{ scale: pressed ? 0.99 : 1 }] }]}
     >
       <View className="relative mb-3 h-[176px] overflow-hidden rounded-2xl bg-slate-900">
         <ImageBackground

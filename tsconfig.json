@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "ES2017",
     "module": "ESNext",
-    "lib": ["ES2017"],
+    "lib": [
+      "ES2017"
+    ],
     "jsx": "react-jsx",
     "moduleResolution": "Bundler",
     "strict": true,
@@ -10,7 +12,14 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "types": ["react", "react-native"]
+    "types": [
+      "react",
+      "react-native"
+    ]
   },
-  "include": ["App.tsx", "src"]
+  "include": [
+    "App.tsx",
+    "src"
+  ],
+  "extends": "expo/tsconfig.base"
 }

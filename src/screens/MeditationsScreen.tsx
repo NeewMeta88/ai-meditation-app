@@ -11,6 +11,9 @@ import { MeditationSession, SessionCard } from "../components/SessionCard";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Meditations">;
 
+const SESSION_CARD_WIDTH = 280;
+const SESSION_CARD_SPACING = 16;
+
 const sessions: MeditationSession[] = [
   {
     id: "morning-serenity",
@@ -61,7 +64,7 @@ export function MeditationsScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background-dark" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-background-dark">
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 28 }}
@@ -103,10 +106,20 @@ export function MeditationsScreen({ navigation }: Props) {
             data={sessions}
             keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
+            contentContainerStyle={{ paddingHorizontal: 24 }}
+            ItemSeparatorComponent={() => <View style={{ width: SESSION_CARD_SPACING }} />}
             decelerationRate="fast"
             snapToAlignment="start"
-            snapToInterval={296}
+            snapToInterval={SESSION_CARD_WIDTH + SESSION_CARD_SPACING}
+            initialNumToRender={3}
+            windowSize={5}
+            removeClippedSubviews
+            getItemLayout={(_, index) => ({
+              length: SESSION_CARD_WIDTH + SESSION_CARD_SPACING,
+              offset: (SESSION_CARD_WIDTH + SESSION_CARD_SPACING) * index,
+              index,
+            })}
+            extraData={isSubscribed}
             renderItem={({ item: session }) => {
               const locked = !isSubscribed && session.isPremium;
 
